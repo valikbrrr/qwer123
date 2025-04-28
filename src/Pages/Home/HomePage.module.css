@@ -8,9 +8,7 @@
   width: 100%;
   min-height: 100vh;
 
-  background-image: url("../../shared/images/fly.webp");
-  background-size: cover;
-  background-position: center;
+  background-color: #000;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -18,11 +16,7 @@
 
 .buttonForm {
   width: 8rem;
-  height: 13rem;
-
-  /* background-color: rgba(255, 255, 255, 0);
-  color: black;
-  border: 2px solid rgba(255, 255, 255, 0); */
+  height: 6rem;
 
   border-radius: 0.75rem;
 
@@ -39,8 +33,6 @@
 }
 
 .buttonForm:hover {
-  background-color: rgba(255, 255, 255, 0);
   color: black;
   border: 2px solid rgba(255, 255, 255, 0);
-  /* cursor: url("../../shared/images/flySwatterPng.png") 16 16, pointer !important; */
 }

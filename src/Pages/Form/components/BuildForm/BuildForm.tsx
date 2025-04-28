@@ -40,7 +40,9 @@ export const BuildForm: React.FC<BuildFormProps> = ({ onClose, config }) => {
           {renderInputs()}
           {renderTextareas()}
           {renderCheckboxes()}
-          <button type="submit">Отправить</button>
+          <button type="button" className={styles.closeButton} onClick={onClose}>
+            Закрыть
+          </button>
         </form>
       </div>
     </>

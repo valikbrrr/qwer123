@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./FormPage.module.css";
-import { BuildForm } from "./components";
+import { BuildForm, ErrorModal } from "./components";
 
 export const FormPage = () => {
   const [isBuildFormOpen, setIsBuildFormOpen] = useState(false);
@@ -9,65 +9,83 @@ export const FormPage = () => {
     textarea: 0,
     checkbox: 0,
   });
+  const [inputValues, setInputValues] = useState({
+    input: "0",
+    textarea: "0",
+    checkbox: "0",
+  });
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   const toggleBuildForm = () => setIsBuildFormOpen((prev) => !prev);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof formConfig) => {
-    const value = Math.max(0, parseInt(e.target.value) || 0); // Защита от отрицательных чисел
-    setFormConfig({ ...formConfig, [field]: value });
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: keyof typeof formConfig
+  ) => {
+    let value = e.target.value;
+    const inputEvent = e.nativeEvent as InputEvent;
+
+    if (inputEvent.inputType) {
+      value = value.replace(/^0+/, "") || "0";
+    }
+
+    const numericValue = Math.max(0, parseInt(value) || 0);
+    setInputValues({ ...inputValues, [field]: value });
+    setFormConfig({ ...formConfig, [field]: numericValue });
+  };
+
+  const handleBuildClick = () => {
+    if (
+      formConfig.input > 10 ||
+      formConfig.textarea > 10 ||
+      formConfig.checkbox > 10
+    ) {
+      setIsErrorModalOpen(true); 
+    } else {
+      setIsBuildFormOpen(true);
+    }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.formWrapper}>
-        <div className={styles.textsWrapp}>
-          <div className={styles.textBlock}>
-            <p className={styles.text}>Input: </p>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Форма генератора</h2>
+        <div className={styles.formWrapper}>
+          <div className={styles.textsWrapp}>
+            {['Input', 'Textarea', 'Checkbox'].map((label) => (
+              <div key={label} className={styles.textBlock}>
+                <p className={styles.text}>{label}:</p>
+              </div>
+            ))}
           </div>
-          <div className={styles.textBlock}>
-            <p className={styles.text}>Textarea: </p>
-          </div>
-          <div className={styles.textBlock}>
-            <p className={styles.text}>Checkbox: </p>
-          </div>
-        </div>
-        <div className={styles.inputsWrapp}>
-          <div className={styles.inputBlock}>
-            <input
-              className={styles.input}
-              type="number"
-              min="0"
-              value={formConfig.input}
-              onChange={(e) => handleInputChange(e, "input")}
-            />
-          </div>
-          <div className={styles.inputBlock}>
-            <input
-              className={styles.input}
-              type="number"
-              min="0"
-              value={formConfig.textarea}
-              onChange={(e) => handleInputChange(e, "textarea")}
-            />
-          </div>
-          <div className={styles.inputBlock}>
-            <input
-              className={styles.input}
-              type="number"
-              min="0"
-              value={formConfig.checkbox}
-              onChange={(e) => handleInputChange(e, "checkbox")}
-            />
+          <div className={styles.inputsWrapp}>
+            {['input', 'textarea', 'checkbox'].map((field) => (
+              <div key={field} className={styles.inputBlock}>
+                <input
+                  className={styles.input}
+                  type="number"
+                  min="0"
+                  value={inputValues[field as keyof typeof inputValues]}
+                  onChange={(e) => 
+                    handleInputChange(e, field as keyof typeof formConfig)
+                  }
+                />
+              </div>
+            ))}
           </div>
         </div>
+        <button className={styles.buttonBuild} onClick={handleBuildClick}>
+          Сгенерировать форму
+        </button>
       </div>
-      <button className={styles.buttonBuild} onClick={toggleBuildForm}>
-        Build
-      </button>
+      
       {isBuildFormOpen && (
-        <BuildForm 
-          onClose={toggleBuildForm} 
-          config={formConfig} 
+        <BuildForm onClose={toggleBuildForm} config={formConfig} />
+      )}
+      {isErrorModalOpen && (
+        <ErrorModal
+          onClose={() => setIsErrorModalOpen(false)}
+          message="Максимальное число для ввода в каждый инпут — 10."
         />
       )}
     </div>

@@ -1,1 +1,2 @@
-export * from "./BuildForm"
+export * from "./BuildForm";
+export * from "./ErrorModal";
